@@ -3,7 +3,7 @@
     $post = $_POST;
 
     // 找出分片文件
-    $dir = '/var/www/'.$post['md5'];
+    $dir = __DIR__ . '/upload/'.$post['md5'];
 
     // 获取分片文件内容
     $block_info = scandir($dir);
@@ -17,7 +17,7 @@
     natsort($block_info);
 
     // 定义保存文件
-    $save_file = "/var/www/".$post['fileName'];
+    $save_file = __DIR__ . '/upload/' . $post['fileName'];
 
     // 没有？建立
     if (!file_exists($save_file)) fopen($post['fileName'], "w");

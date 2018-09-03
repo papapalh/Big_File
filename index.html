@@ -63,14 +63,14 @@
 
     // 创建上传
     var uploader = WebUploader.create({
-         swf: '/webuploader-0.1.5/Uploader.swf',
-        server: 'index.php',      // 服务端地址
-        pick: '#picker',          // 指定选择文件的按钮容器
-         resize: false,
-         chunked: true,            //开启分片上传
-         chunkSize: 1024*1024*4,   //每一片的大小
-        chunkRetry: 100,          // 如果遇到网络错误,重新上传次数
-        threads: 3,               // [默认值：3] 上传并发数。允许同时最大上传进程数。
+        swf: '/webuploader-0.1.5/Uploader.swf',
+        server: 'index.php',          // 服务端地址
+        pick: '#picker',              // 指定选择文件的按钮容器
+        resize: false,
+        chunked: true,                //开启分片上传
+        chunkSize: 1024 * 1024 * 0.5,   //每一片的大小
+        chunkRetry: 100,              // 如果遇到网络错误,重新上传次数
+        threads: 3,                   // [默认值：3] 上传并发数。允许同时最大上传进程数。
     });
 
     // 上传提交
@@ -89,26 +89,18 @@
             file.wholeMd5 = fileMd5;
             file_md5 = fileMd5;
             log("MD5计算完成。");
-            log("正在查找有无断点...");
 
+            // 检查是否有已经上传成功的分片文件
             $.post('check.php', {md5: file_md5}, function (data) {
                 data = JSON.parse(data);
-                switch (data.code) {
-                    // 断点
-                    case '0':
-                        log('有断点.正在准备从断点处上传文件。');
-                        for (var i in data.block_info) {
-                            block_info.push(data.block_info[i]);
-                        }
-                        file.status = 0;
-                    break;
-                    // 无断点
-                    case '1':
-                        log('无断点.上传新文件。');
-                        file.status = 1;
-                    break;
+
+                // 如果有对应的分片，推入数组
+                if (data.block_info) {
+                    for (var i in data.block_info) {
+                        block_info.push(data.block_info[i]);
+                    }
+                    log("有断点...");
                 }
-                $('#ctlBtn').show();
             })
         });
     });
