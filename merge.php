@@ -19,11 +19,11 @@
     // 定义保存文件
     $save_file = __DIR__ . '/upload/' . $post['fileName'];
 
-    // 没有？建立
-    if (!file_exists($save_file)) fopen($post['fileName'], "w");
-
     // 开始写入
     $out = @fopen($save_file, "wb");
+
+    // 建立失败返回
+    if (!file_exists($save_file)) return false;
 
     // 增加文件锁
     if (flock($out, LOCK_EX)) {
